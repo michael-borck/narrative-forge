@@ -1,0 +1,28 @@
+appId: com.narrativeforge.app
+productName: NarrativeForge
+directories:
+  buildResources: resources
+  output: release
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{tsconfig*.json}'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+mac:
+  target:
+    - dmg
+    - zip
+  artifactName: ${name}-${version}-${os}-${arch}.${ext}
+  entitlementsInherit: resources/entitlements.mac.plist
+win:
+  target:
+    - nsis
+  artifactName: ${name}-${version}-${os}-setup.${ext}
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+linux:
+  target:
+    - AppImage
+  artifactName: ${name}-${version}-${os}-${arch}.${ext}

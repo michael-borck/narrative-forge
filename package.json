@@ -1,0 +1,54 @@
+{
+  "name": "narrative-forge",
+  "version": "0.1.0",
+  "description": "Interactive Fiction Authoring Tool for Education",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "start": "electron-vite preview",
+    "postinstall": "electron-builder install-app-deps",
+    "build:unpack": "npm run build && electron-builder --dir",
+    "build:win": "npm run build && electron-builder --win",
+    "build:mac": "npm run build && electron-builder --mac",
+    "build:linux": "npm run build && electron-builder --linux",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
+    "typecheck:web": "tsc --noEmit -p tsconfig.web.json",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "lint": "eslint . --ext .ts,.tsx"
+  },
+  "keywords": [
+    "interactive-fiction",
+    "education",
+    "ink",
+    "electron",
+    "storytelling"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@electron-toolkit/utils": "^4.0.0",
+    "@xyflow/react": "^12.10.2",
+    "inkjs": "^2.4.0",
+    "jszip": "^3.10.1",
+    "marked": "^17.0.5",
+    "openai": "^6.33.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.57.2",
+    "@typescript-eslint/parser": "^8.57.2",
+    "@vitejs/plugin-react": "^6.0.1",
+    "electron": "^41.1.0",
+    "electron-builder": "^26.8.1",
+    "electron-vite": "^5.0.0",
+    "eslint": "^10.1.0",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3"
+  }
+}
