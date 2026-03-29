@@ -1,14 +1,14 @@
 {
   "name": "narrative-forge",
   "version": "0.1.0",
-  "description": "Interactive Fiction Authoring Tool for Education",
+  "description": "Interactive Fiction Authoring Tool for Education — Generate playable branching stories from source material using AI + Ink",
   "main": "./out/main/index.mjs",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "start": "electron-vite preview",
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "electron-builder install-app-deps || true",
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "npm run build && electron-builder --mac",
@@ -17,23 +17,36 @@
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "lint": "eslint . --ext .ts,.tsx",
-    "build:cli": "npx tsc src/cli/index.ts --outDir out/cli --module nodenext --moduleResolution nodenext --target esnext --esModuleInterop --skipLibCheck",
+    "build:cli": "tsc -p tsconfig.cli.json",
+    "prepublishOnly": "npm run build:cli",
     "cli": "npx tsx src/cli/index.ts"
   },
   "bin": {
     "narrativeforge": "./out/cli/index.js"
   },
+  "files": [
+    "out/cli/",
+    "README.md",
+    "LICENSE"
+  ],
   "keywords": [
     "interactive-fiction",
     "education",
     "ink",
     "electron",
-    "storytelling"
+    "storytelling",
+    "narrative",
+    "authoring",
+    "cli"
   ],
-  "author": "",
+  "author": "michael-borck",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michael-borck/narrative-forge.git"
+  },
+  "homepage": "https://github.com/michael-borck/narrative-forge",
   "dependencies": {
-    "@types/yargs": "^17.0.35",
     "@xyflow/react": "^12.10.2",
     "inkjs": "^2.4.0",
     "jszip": "^3.10.1",
@@ -45,8 +58,10 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@types/yargs": "^17.0.35",
     "@typescript-eslint/eslint-plugin": "^8.57.2",
     "@typescript-eslint/parser": "^8.57.2",
     "@vitejs/plugin-react": "^6.0.1",
