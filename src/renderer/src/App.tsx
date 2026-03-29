@@ -2,7 +2,7 @@ import { useAppStore } from './stores/appStore'
 import InputPanel from './components/InputPanel'
 import GenerationPanel from './components/GenerationPanel'
 import PreviewPlayer from './components/PreviewPlayer'
-import NodeGraphView from './components/NodeGraphView'
+import NodeEditor from './components/NodeEditor'
 import ExportPanel from './components/ExportPanel'
 import SettingsPanel from './components/SettingsPanel'
 
@@ -21,16 +21,16 @@ function App(): React.ReactElement {
         <nav className="app-nav">
           <NavButton view="input" current={view} onClick={setView}>Input</NavButton>
           <NavButton view="generation" current={view} onClick={setView}>Generate</NavButton>
-          <NavButton view="graph" current={view} onClick={setView}>Graph</NavButton>
+          <NavButton view="graph" current={view} onClick={setView}>Editor</NavButton>
           <NavButton view="preview" current={view} onClick={setView}>Preview</NavButton>
           <NavButton view="export" current={view} onClick={setView}>Export</NavButton>
           <NavButton view="settings" current={view} onClick={setView}>Settings</NavButton>
         </nav>
       </header>
-      <main className="app-main">
+      <main className={`app-main ${view === 'graph' ? 'no-padding' : ''}`}>
         {view === 'input' && <InputPanel />}
         {view === 'generation' && <GenerationPanel />}
-        {view === 'graph' && <NodeGraphView />}
+        {view === 'graph' && <NodeEditor />}
         {view === 'preview' && <PreviewPlayer />}
         {view === 'export' && <ExportPanel />}
         {view === 'settings' && <SettingsPanel />}

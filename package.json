@@ -16,7 +16,12 @@
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
-    "lint": "eslint . --ext .ts,.tsx"
+    "lint": "eslint . --ext .ts,.tsx",
+    "build:cli": "npx tsc src/cli/index.ts --outDir out/cli --module nodenext --moduleResolution nodenext --target esnext --esModuleInterop --skipLibCheck",
+    "cli": "npx tsx src/cli/index.ts"
+  },
+  "bin": {
+    "narrativeforge": "./out/cli/index.js"
   },
   "keywords": [
     "interactive-fiction",
@@ -28,6 +33,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@types/yargs": "^17.0.35",
     "@xyflow/react": "^12.10.2",
     "inkjs": "^2.4.0",
     "jszip": "^3.10.1",
@@ -35,6 +41,7 @@
     "openai": "^6.33.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "yargs": "^18.0.0",
     "zustand": "^5.0.12"
   },
   "devDependencies": {
@@ -47,6 +54,7 @@
     "electron-builder": "^26.8.1",
     "electron-vite": "^5.0.0",
     "eslint": "^10.1.0",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.2",
     "vite": "^8.0.3"
   }

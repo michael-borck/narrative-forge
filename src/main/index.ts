@@ -80,6 +80,29 @@ app.whenReady().then(() => {
     return result.filePath
   })
 
+  // IPC: Open image file and return as base64 data URL
+  ipcMain.handle('image:import', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [
+        { name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'] }
+      ]
+    })
+    if (result.canceled || result.filePaths.length === 0) return null
+    const filePath = result.filePaths[0]
+    const buffer = await readFile(filePath)
+    const ext = filePath.split('.').pop()?.toLowerCase() || 'png'
+    const mimeTypes: Record<string, string> = {
+      jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
+      webp: 'image/webp', gif: 'image/gif', svg: 'image/svg+xml'
+    }
+    const mime = mimeTypes[ext] || 'image/png'
+    const base64 = Buffer.from(buffer).toString('base64')
+    const dataUrl = `data:${mime};base64,${base64}`
+    const fileName = filePath.split('/').pop() || `image.${ext}`
+    return { dataUrl, fileName, filePath }
+  })
+
   createWindow()
 
   app.on('activate', () => {

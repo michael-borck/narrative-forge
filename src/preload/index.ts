@@ -13,7 +13,10 @@ const api = {
     ipcRenderer.invoke('dialog:openFile', filters),
 
   saveFile: (defaultName: string, content: string, filters?: FileFilter[]): Promise<string | null> =>
-    ipcRenderer.invoke('dialog:saveFile', defaultName, content, filters)
+    ipcRenderer.invoke('dialog:saveFile', defaultName, content, filters),
+
+  importImage: (): Promise<{ dataUrl: string; fileName: string; filePath: string } | null> =>
+    ipcRenderer.invoke('image:import')
 }
 
 contextBridge.exposeInMainWorld('api', api)

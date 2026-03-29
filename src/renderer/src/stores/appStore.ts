@@ -89,6 +89,13 @@ export interface AppState {
   theme: 'light' | 'dark' | 'system'
   setTheme: (theme: 'light' | 'dark' | 'system') => void
 
+  // Node editor
+  selectedNodeId: string | null
+  setSelectedNodeId: (id: string | null) => void
+  nodePositions: Record<string, { x: number; y: number }>
+  setNodePositions: (positions: Record<string, { x: number; y: number }>) => void
+  updateNodePosition: (id: string, x: number, y: number) => void
+
   // Error
   error: string | null
   setError: (error: string | null) => void
@@ -155,6 +162,14 @@ export const useAppStore = create<AppState>()(persist((set) => ({
   // Theme
   theme: 'dark',
   setTheme: (theme) => set({ theme }),
+
+  // Node editor
+  selectedNodeId: null,
+  setSelectedNodeId: (selectedNodeId) => set({ selectedNodeId }),
+  nodePositions: {},
+  setNodePositions: (nodePositions) => set({ nodePositions }),
+  updateNodePosition: (id, x, y) =>
+    set((s) => ({ nodePositions: { ...s.nodePositions, [id]: { x, y } } })),
 
   // Error
   error: null,
