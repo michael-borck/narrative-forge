@@ -2,7 +2,7 @@
   "name": "narrative-forge",
   "version": "0.1.0",
   "description": "Interactive Fiction Authoring Tool for Education",
-  "main": "./out/main/index.js",
+  "main": "./out/main/index.mjs",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
@@ -28,7 +28,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@electron-toolkit/utils": "^4.0.0",
     "@xyflow/react": "^12.10.2",
     "inkjs": "^2.4.0",
     "jszip": "^3.10.1",

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAppStore, GenerationStage } from '../stores/appStore'
 import { generateStory } from '../lib/aiService'
+import { SAMPLE_INK_SOURCE } from '../lib/sampleStory'
 
 const STAGES: { key: GenerationStage; label: string }[] = [
   { key: 'analysis', label: 'Analysis' },
@@ -20,10 +21,15 @@ export default function GenerationPanel() {
   const setError = useAppStore((s) => s.setError)
   const setView = useAppStore((s) => s.setCurrentView)
   const inkSource = useAppStore((s) => s.inkSource)
+  const apiKey = useAppStore((s) => s.apiKey)
+  const aiProvider = useAppStore((s) => s.aiProvider)
   const [isGenerating, setIsGenerating] = useState(false)
 
   const stageIndex = STAGES.findIndex((s) => s.key === stage)
   const awaitingClarification = stage === 'clarification' && questions.length > 0
+
+  const needsApiKey = (aiProvider === 'claude' || aiProvider === 'openai' || aiProvider === 'auto') && !apiKey
+  const canGenerate = !needsApiKey || aiProvider === 'ollama'
 
   const startGeneration = useCallback(async () => {
     setIsGenerating(true)
@@ -38,7 +44,7 @@ export default function GenerationPanel() {
   }, [setError])
 
   useEffect(() => {
-    if (stage === 'idle' && !isGenerating) {
+    if (stage === 'idle' && !isGenerating && canGenerate) {
       startGeneration()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -47,12 +53,20 @@ export default function GenerationPanel() {
     setIsGenerating(true)
     setError(null)
     try {
-      await generateStory(true) // resume from after clarification
+      await generateStory(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Generation failed')
     } finally {
       setIsGenerating(false)
     }
+  }
+
+  const loadDemoStory = () => {
+    useAppStore.getState().setInkSource(SAMPLE_INK_SOURCE)
+    useAppStore.getState().setProjectName(useAppStore.getState().projectName || 'Demo Story')
+    useAppStore.getState().setGenerationStage('done')
+    useAppStore.getState().addGenerationLog('[Demo] Loaded sample story: "The New Project Manager"')
+    useAppStore.getState().addGenerationLog('[Done] Demo story ready for preview and export.')
   }
 
   return (
@@ -65,13 +79,39 @@ export default function GenerationPanel() {
             ? 'Generating your interactive story...'
             : awaitingClarification
               ? 'Please answer the questions below to guide the story'
-              : 'Ready to generate'}
+              : needsApiKey
+                ? 'API key required to generate'
+                : 'Ready to generate'}
       </p>
 
       {error && (
         <div className="error-banner">
           <span>{error}</span>
           <button className="error-dismiss" onClick={() => setError(null)}>&times;</button>
+        </div>
+      )}
+
+      {/* No API key warning */}
+      {needsApiKey && stage !== 'done' && (
+        <div style={{
+          background: 'rgba(232, 168, 56, 0.15)',
+          border: '1px solid var(--warning)',
+          borderRadius: 'var(--radius)',
+          padding: '16px',
+          marginBottom: 20,
+          color: 'var(--warning)'
+        }}>
+          <p style={{ marginBottom: 12 }}>
+            No API key configured. Set one in Settings, or switch to Ollama for local generation.
+          </p>
+          <div className="btn-row" style={{ marginTop: 0 }}>
+            <button className="btn btn-secondary" onClick={() => setView('settings')}>
+              Open Settings
+            </button>
+            <button className="btn btn-secondary" onClick={loadDemoStory}>
+              Load Demo Story
+            </button>
+          </div>
         </div>
       )}
 
@@ -110,12 +150,13 @@ export default function GenerationPanel() {
 
       {/* Generation log */}
       <div className="gen-log">
-        {log.length === 0 && <div className="gen-log-entry">Waiting to start...</div>}
+        {log.length === 0 && !needsApiKey && <div className="gen-log-entry">Waiting to start...</div>}
+        {log.length === 0 && needsApiKey && <div className="gen-log-entry">Configure an AI provider to begin generation, or load the demo story.</div>}
         {log.map((entry, i) => (
           <div
             key={i}
             className={`gen-log-entry ${
-              entry.startsWith('[Stage') ? 'stage' : entry.startsWith('[Error') ? 'error' : entry.startsWith('[Done') ? 'success' : ''
+              entry.startsWith('[Stage') || entry.startsWith('[Demo') ? 'stage' : entry.startsWith('[Error') ? 'error' : entry.startsWith('[Done') ? 'success' : ''
             }`}
           >
             {entry}
@@ -148,11 +189,14 @@ export default function GenerationPanel() {
         </>
       )}
 
-      {/* Retry button on error */}
+      {/* Retry/back buttons on error */}
       {error && !isGenerating && (
         <div className="btn-row">
           <button className="btn btn-primary" onClick={startGeneration}>
             Retry Generation
+          </button>
+          <button className="btn btn-secondary" onClick={loadDemoStory}>
+            Load Demo Instead
           </button>
           <button className="btn btn-secondary" onClick={() => setView('input')}>
             Back to Input

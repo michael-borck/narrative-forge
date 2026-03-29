@@ -1,7 +1,8 @@
 import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { readFile, writeFile } from 'fs/promises'
+
+const isDev = !app.isPackaged
 
 function createWindow(): BrowserWindow {
   const mainWindow = new BrowserWindow({
@@ -12,7 +13,7 @@ function createWindow(): BrowserWindow {
     show: false,
     titleBarStyle: 'hiddenInset',
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false
     }
   })
@@ -26,7 +27,7 @@ function createWindow(): BrowserWindow {
     return { action: 'deny' }
   })
 
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+  if (isDev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
@@ -36,11 +37,7 @@ function createWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.narrativeforge')
-
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
+  app.setAppUserModelId?.('com.narrativeforge')
 
   // IPC: Read file from disk
   ipcMain.handle('file:read', async (_event, filePath: string) => {

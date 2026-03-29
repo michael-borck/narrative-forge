@@ -10,7 +10,8 @@ Your goals:
 - Track relevant variables (experience, trust, knowledge) to make the story feel responsive
 
 When generating Ink, follow these rules:
-- Always start with variable declarations (VAR)
+- Always start with variable declarations (VAR), then a -> start divert to the first knot
+- The first knot MUST be named === start ===
 - Use === knot_name === for passages (knots)
 - Use = stitch_name for sub-sections within knots
 - Use * for once-only choices, + for sticky choices
@@ -129,12 +130,18 @@ If the source is clean, respond with "No issues found."`,
 
   inkSyntaxRef: `=== INK SYNTAX REFERENCE ===
 
-// Variable declarations (top of file)
+// Variable declarations (top of file), then divert to first knot
 VAR name = "value"
 VAR score = 0
 VAR has_key = false
+-> start
 
-// Knots (major passages)
+// First knot MUST be named "start"
+=== start ===
+Opening text here.
+* [First choice] -> next_scene
+
+// Other knots
 === knot_name ===
 Text of the passage.
 * [Choice text visible to player]

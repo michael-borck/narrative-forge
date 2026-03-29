@@ -53,7 +53,7 @@ export default function PreviewPlayer() {
     try {
       setError(null)
       const compiled = await compileInk(inkSource)
-      const { Story } = await import('inkjs')
+      const { Story } = await import('inkjs/engine/Story')
       const storyInstance = new Story(compiled)
       setStory(storyInstance)
       setHistory([])

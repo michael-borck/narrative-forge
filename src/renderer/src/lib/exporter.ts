@@ -101,7 +101,7 @@ export async function exportStandaloneHTML(
   <div id="content"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/inkjs@2.3.0/dist/ink.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/inkjs@2.3.0/dist/ink.js"></script>
 <script>
 (function() {
   var storyJson = ${escapedJson};
@@ -109,48 +109,52 @@ export async function exportStandaloneHTML(
   var content = document.getElementById('content');
 
   function continueStory() {
-    var text = '';
+    var textDiv = document.createElement('div');
+    textDiv.className = 'text';
     while (story.canContinue) {
-      text += '<p>' + story.Continue().trim() + '</p>';
+      var line = story.Continue().trim();
+      if (line) {
+        var p = document.createElement('p');
+        p.textContent = line;
+        textDiv.appendChild(p);
+      }
     }
+    content.appendChild(textDiv);
 
-    var choicesHtml = '';
     if (story.currentChoices.length > 0) {
-      choicesHtml = '<div class="choices">';
+      var choicesDiv = document.createElement('div');
+      choicesDiv.className = 'choices';
       story.currentChoices.forEach(function(choice, i) {
-        choicesHtml += '<button class="choice" data-index="' + i + '">' + choice.text + '</button>';
+        var btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.textContent = choice.text;
+        btn.addEventListener('click', function() {
+          choicesDiv.remove();
+          story.ChooseChoiceIndex(i);
+          continueStory();
+        });
+        choicesDiv.appendChild(btn);
       });
-      choicesHtml += '</div>';
+      content.appendChild(choicesDiv);
     }
 
-    var endHtml = '';
     if (!story.canContinue && story.currentChoices.length === 0) {
-      endHtml = '<div class="ending">— End of Story —</div>';
-      endHtml += '<button class="restart" onclick="location.reload()">Play Again</button>';
+      var endDiv = document.createElement('div');
+      endDiv.className = 'ending';
+      endDiv.textContent = '\\u2014 End of Story \\u2014';
+      content.appendChild(endDiv);
+      var restartBtn = document.createElement('button');
+      restartBtn.className = 'restart';
+      restartBtn.textContent = 'Play Again';
+      restartBtn.addEventListener('click', function() { location.reload(); });
+      content.appendChild(restartBtn);
     }
 
-    content.innerHTML += '<div class="text">' + text + '</div>' + choicesHtml + endHtml;
-
-    // Scroll to new content
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-
-    // Bind choice clicks
-    var buttons = content.querySelectorAll('.choice');
-    buttons.forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var idx = parseInt(this.getAttribute('data-index'));
-        // Remove choices
-        var choiceDiv = this.parentElement;
-        choiceDiv.remove();
-        story.ChooseChoiceIndex(idx);
-        continueStory();
-      });
-    });
   }
 
   continueStory();
 
-  // Add meta
   var meta = document.createElement('div');
   meta.className = 'meta';
   meta.textContent = 'Created with NarrativeForge';

@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 export type InputMode = 'topic' | 'lesson' | 'methodology' | 'case-study' | 'lecture-notes' | 'scenario'
 export type View = 'input' | 'generation' | 'graph' | 'preview' | 'export' | 'settings'
@@ -93,7 +94,7 @@ export interface AppState {
   setError: (error: string | null) => void
 }
 
-export const useAppStore = create<AppState>((set) => ({
+export const useAppStore = create<AppState>()(persist((set) => ({
   // Navigation
   currentView: 'input',
   setCurrentView: (view) => set({ currentView: view }),
@@ -158,4 +159,16 @@ export const useAppStore = create<AppState>((set) => ({
   // Error
   error: null,
   setError: (error) => set({ error })
+}), {
+  name: 'narrativeforge-settings',
+  partialize: (state) => ({
+    aiProvider: state.aiProvider,
+    apiKey: state.apiKey,
+    ollamaUrl: state.ollamaUrl,
+    ollamaModel: state.ollamaModel,
+    theme: state.theme,
+    storyLength: state.storyLength,
+    protagonistType: state.protagonistType,
+    tone: state.tone
+  })
 }))
